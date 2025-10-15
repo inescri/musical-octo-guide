@@ -59,10 +59,8 @@ export default class BinanceProvider extends WalletProvider {
   }
 
   async getBalance() {
-    console.log("Getting balance from Binance");
     const bal = await this.library.getBalance();
-    console.log(bal.total);
-    return 10000;
+    return bal.total;
   }
 
   async sendBTC(): Promise<string> {
