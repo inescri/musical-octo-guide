@@ -1,5 +1,5 @@
-import * as bitcoin from 'bitcoinjs-lib'
-import { WalletProvider } from '.'
+import * as bitcoin from "bitcoinjs-lib";
+import { WalletProvider } from ".";
 import {
   BINANCE,
   BIP322,
@@ -7,59 +7,67 @@ import {
   ProviderType,
   SignMessageOptions,
   WalletProviderSignPsbtOptions,
-} from '../..'
-import { omitUndefined } from '../../lib/utils'
+} from "../..";
+import { omitUndefined } from "../../lib/utils";
 
 export default class BinanceProvider extends WalletProvider {
-  observer?: MutationObserver
+  observer?: MutationObserver;
 
   public get library(): any | undefined {
     // return (window as any).unisat
-    return (window as any).binancew3w?.bitcoin
+    return (window as any).binancew3w?.bitcoin;
   }
 
   initialize(): void {
-    if (typeof window !== 'undefined' && typeof document !== 'undefined') {
+    if (typeof window !== "undefined" && typeof document !== "undefined") {
       this.observer = new window.MutationObserver(() => {
         if (this.library || this.isMobile()) {
-          this.$store.setKey('hasProvider', {
+          this.$store.setKey("hasProvider", {
             ...this.$store.get().hasProvider,
             [BINANCE]: true,
-          })
-          this.observer?.disconnect()
+          });
+          this.observer?.disconnect();
         }
-      })
-      this.observer.observe(document, { childList: true, subtree: true })
+      });
+      this.observer.observe(document, { childList: true, subtree: true });
     }
   }
 
   async connect(_: ProviderType): Promise<void> {
-    if (!this.library) throw new Error("Binance isn't installed")
-    const binanceAccounts = await this.library.requestAccounts()
-    if (!binanceAccounts) throw new Error('No accounts found')
-    const binancePubKey = await this.library.getPublicKey()
-    if (!binancePubKey) throw new Error('No public key found')
-    this.$store.setKey('accounts', binanceAccounts)
-    this.$store.setKey('address', binanceAccounts[0])
-    this.$store.setKey('paymentAddress', binanceAccounts[0])
-    this.$store.setKey('publicKey', binancePubKey)
-    this.$store.setKey('paymentPublicKey', binancePubKey)
+    if (!this.library) throw new Error("Binance isn't installed");
+    const binanceAccounts = await this.library.requestAccounts();
+    if (!binanceAccounts) throw new Error("No accounts found");
+    const binancePubKey = await this.library.getPublicKey();
+    if (!binancePubKey) throw new Error("No public key found");
+    this.$store.setKey("accounts", binanceAccounts);
+    this.$store.setKey("address", binanceAccounts[0]);
+    this.$store.setKey("paymentAddress", binanceAccounts[0]);
+    this.$store.setKey("publicKey", binancePubKey);
+    this.$store.setKey("paymentPublicKey", binancePubKey);
   }
 
   dispose() {
-    this.observer?.disconnect()
+    this.observer?.disconnect();
   }
 
   disconnect(): void {
-    console.log('DISCONNECT BINANCE')
+    console.log("DISCONNECT BINANCE");
   }
 
   async requestAccounts(): Promise<string[]> {
-    return await this.library.requestAccounts()
+    return await this.library.requestAccounts();
+  }
+
+  async getPublicKey() {
+    return await this.library?.getPublicKey();
+  }
+  async getBalance() {
+    const bal = await this.library.getBalance();
+    return bal.total;
   }
 
   async sendBTC(): Promise<string> {
-    throw new Error('NOT IMPLEMENTED')
+    throw new Error("NOT IMPLEMENTED");
   }
 
   override async signMessage(
@@ -67,8 +75,8 @@ export default class BinanceProvider extends WalletProvider {
     options?: SignMessageOptions
   ): Promise<string> {
     const protocol =
-      options?.protocol === BIP322 ? BIP322_SIMPLE : options?.protocol
-    return await this.library?.signMessage(message, protocol)
+      options?.protocol === BIP322 ? BIP322_SIMPLE : options?.protocol;
+    return await this.library?.signMessage(message, protocol);
   }
 
   async signPsbt({
@@ -78,9 +86,9 @@ export default class BinanceProvider extends WalletProvider {
     inputsToSign,
   }: WalletProviderSignPsbtOptions): Promise<
     | {
-        signedPsbtHex: string | undefined
-        signedPsbtBase64: string | undefined
-        txId?: string | undefined
+        signedPsbtHex: string | undefined;
+        signedPsbtBase64: string | undefined;
+        txId?: string | undefined;
       }
     | undefined
   > {
@@ -90,23 +98,23 @@ export default class BinanceProvider extends WalletProvider {
         autoFinalized: finalize,
         toSignInputs: inputsToSign,
       })
-    )
+    );
 
-    const psbtSignedPsbt = bitcoin.Psbt.fromHex(signedPsbt)
+    const psbtSignedPsbt = bitcoin.Psbt.fromHex(signedPsbt);
 
     if (finalize && broadcast) {
-      const txId = await this.pushPsbt(signedPsbt)
+      const txId = await this.pushPsbt(signedPsbt);
       return {
         signedPsbtHex: psbtSignedPsbt.toHex(),
         signedPsbtBase64: psbtSignedPsbt.toBase64(),
         txId,
-      }
+      };
     }
 
     return {
       signedPsbtHex: psbtSignedPsbt.toHex(),
       signedPsbtBase64: psbtSignedPsbt.toBase64(),
       txId: undefined,
-    }
+    };
   }
 }
