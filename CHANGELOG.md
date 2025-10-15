@@ -1,189 +1,156 @@
-# demo.lasereyes.build
+# @omnisat/lasereyes-core
 
-## 0.0.0
+## 0.0.72
 
 ### Patch Changes
 
 - 2450f0b: Integrate Alkanes and add oylnet
-- Updated dependencies
-  - @omnisat/lasereyes@0.0.150
 
-## 0.0.0-next.4
+## 0.0.72-next.0
 
 ### Patch Changes
 
+- bd6058e: test
 - Integrate Alkanes and add oylnet
-- Updated dependencies
-  - @omnisat/lasereyes@0.0.150-next.0
 
-## 0.0.0-next.3
+## 0.0.69-next.5
 
 ### Patch Changes
 
-- @omnisat/lasereyes@0.0.147-next.5
+- e61e794: testing
+- e8bf235: buildn
+- 8902f2a: changes test
+- 897d3d3: test changesets
 
-## 0.0.0-next.2
-
-### Patch Changes
-
-- Updated dependencies [e61e794]
-- Updated dependencies [e8bf235]
-- Updated dependencies [8902f2a]
-- Updated dependencies [897d3d3]
-  - @omnisat/lasereyes@0.0.147-next.4
-
-## 0.0.0-next.1
+## 0.0.69-next.1
 
 ### Patch Changes
 
-- Updated dependencies [6c0eb50]
-  - @omnisat/lasereyes@0.0.147-next.1
+- 6c0eb50: testing
 
-## 0.0.0-next.0
+## 0.0.69-next.0
 
 ### Patch Changes
 
-- Updated dependencies [4546fa5]
-  - @omnisat/lasereyes@0.0.147-next.0
+- 4546fa5: testing
 
 ## 0.0.0-next-20250417121819
 
 ### Patch Changes
 
-- Updated dependencies [6fbc528]
-  - @omnisat/lasereyes@0.0.0-next-20250417121819
+- 6fbc528: release testing
 
 ## 0.0.0-next-20250417120840
 
 ### Patch Changes
 
-- Updated dependencies [a19fea3]
-  - @omnisat/lasereyes@0.0.0-next-20250417120840
+- a19fea3: release testing
 
 ## 0.0.0-next-20250417115249
 
 ### Patch Changes
 
-- Updated dependencies [4ed5339]
-  - @omnisat/lasereyes@0.0.0-next-20250417115249
+- 4ed5339: working through changesets
 
-## 0.1.8
-
-### Patch Changes
-
-- Updated dependencies [bbbc320]
-  - @omnisat/lasereyes@0.0.147
-
-## 0.1.7
+## 0.0.69
 
 ### Patch Changes
 
-- @omnisat/lasereyes@0.2.1
+- bbbc320: Patch release for development version (maintaining 0.0.x versioning)
 
-## 0.1.6
-
-### Patch Changes
-
-- Updated dependencies [55417a2]
-- Updated dependencies
-  - @omnisat/lasereyes@0.2.0
-
-## 0.1.6-next.0
+## 0.2.1
 
 ### Patch Changes
 
-- Updated dependencies
-  - @omnisat/lasereyes@0.2.0-next.0
+- 9ebd105: Patch release for development version
 
-## 0.1.5
+## 0.2.0
 
-### Patch Changes
+### Minor Changes
 
-- Updated dependencies
-  - @omnisat/lasereyes@0.1.0
-
-## 0.1.4
+- 55417a2: Development updates for next release
 
 ### Patch Changes
 
-- Updated dependencies [2c5f480]
-- Updated dependencies [b7cc8e8]
-- Updated dependencies [70db360]
-  - @omnisat/lasereyes@0.0.144
+- Patch updates for stable release
 
-## 0.1.4-next.7
+## 0.2.0-next.0
 
-### Patch Changes
+### Minor Changes
 
-- Updated dependencies [2c5f480]
-- Updated dependencies [70db360]
-  - @omnisat/lasereyes@0.0.144-next.7
+- Development updates for next release
 
-## 0.1.4-next.6
+## 0.1.0
 
-### Patch Changes
+### Minor Changes
 
-- Updated dependencies [70db360]
-  - @omnisat/lasereyes@0.0.144-next.6
+- Update packages with latest development changes
 
-## 0.1.4-next.5
+## 0.0.66
 
 ### Patch Changes
 
-- Updated dependencies [2c5f480]
-  - @omnisat/lasereyes@0.0.144-next.5
+- 2c5f480: disable xverse inscription fetch
+- b7cc8e8: fix errors related to lagging state
+- 70db360: bump to publish xverse bypass to fight problems w inscription fetching.
 
-## 0.1.4-next.4
-
-### Patch Changes
-
-- Updated dependencies [46cdbd4]
-  - @omnisat/lasereyes@0.0.144-next.4
-
-## 0.1.4-next.3
+## 0.0.66-next.7
 
 ### Patch Changes
 
-- Updated dependencies
-  - @omnisat/lasereyes@0.0.144-next.3
+- 2c5f480: disable xverse inscription fetch
+- 70db360: bump to publish xverse bypass to fight problems w inscription fetching.
 
-## 0.1.4-next.2
-
-### Patch Changes
-
-- Updated dependencies
-  - @omnisat/lasereyes@0.0.144-next.2
-
-## 0.1.4-next.1
+## 0.0.66-next.6
 
 ### Patch Changes
 
-- @omnisat/lasereyes@0.0.144-next.1
+- 70db360: bump to publish xverse bypass to fight problems w inscription fetching.
 
-## 0.1.4-next.0
-
-### Patch Changes
-
-- Updated dependencies [4ec0930]
-  - @omnisat/lasereyes@0.0.144-next.0
-
-## 0.1.3
+## 0.0.66-next.5
 
 ### Patch Changes
 
-- Updated dependencies [13a6ff9]
-  - @omnisat/lasereyes@0.0.143
+- 2c5f480: disable xverse inscription fetch
 
-## 0.1.2
-
-### Patch Changes
-
-- Updated dependencies [02badfe]
-  - @omnisat/lasereyes@0.0.8
-
-## 0.1.1
+## 0.0.66-next.4
 
 ### Patch Changes
 
-- Updated dependencies [482a9be]
-  - @omnisat/lasereyes@0.0.5
+- 46cdbd4: bump to trigger deployment
+
+## 0.0.66-next.3
+
+### Patch Changes
+
+- fix errors related to lagging state
+
+## 0.0.66-next.2
+
+### Patch Changes
+
+- Export `MaestroDataSource`, `MempoolSpaceDataSource`, `DataSourceManager`, and `SandshrewDataSource` from `lasereyes-core`.
+
+## 0.0.66-next.1
+
+### Patch Changes
+
+- d76e9f1: chore: update dependencies and refactor input handling in signPsbt method
+
+  - Upgrade `sats-connect` to version 3.3.0
+  - Modify `inputsToSign` to accept an array of objects for better structure
+  - Refactor various provider implementations to accommodate new input structure
+  - Adjust React peer dependencies to support versions >=17
+
+## 0.0.66-next.0
+
+### Patch Changes
+
+- 4ec0930: - add `inputsToSign` to signPsbt method as an option
+  - use stored data in leather provider rather than repeated pop-ups
+
+## 0.0.65
+
+### Patch Changes
+
+- 13a6ff9: bug fix, config
