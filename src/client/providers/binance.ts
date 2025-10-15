@@ -14,7 +14,6 @@ export default class BinanceProvider extends WalletProvider {
   observer?: MutationObserver;
 
   public get library(): any | undefined {
-    // return (window as any).unisat
     return (window as any).binancew3w?.bitcoin;
   }
 
@@ -35,6 +34,7 @@ export default class BinanceProvider extends WalletProvider {
 
   async connect(_: ProviderType): Promise<void> {
     if (!this.library) throw new Error("Binance isn't installed");
+    await this.library.switchNetwork("livenet");
     const binanceAccounts = await this.library.requestAccounts();
     if (!binanceAccounts) throw new Error("No accounts found");
     const binancePubKey = await this.library.getPublicKey();
@@ -48,10 +48,6 @@ export default class BinanceProvider extends WalletProvider {
 
   dispose() {
     this.observer?.disconnect();
-  }
-
-  disconnect(): void {
-    console.log("DISCONNECT BINANCE");
   }
 
   async requestAccounts(): Promise<string[]> {
