@@ -1,6 +1,7 @@
 import { BitcoinNetworkType } from 'sats-connect'
 import {
   BaseNetwork,
+  BinanceNetwork,
   CmdruidNetwork,
   FractalNetwork,
   KeplrChain,
@@ -47,6 +48,13 @@ export const getUnisatNetwork = (network: string) => {
   if (network === BaseNetwork.FRACTAL_TESTNET)
     return UnisatNetwork.FRACTAL_TESTNET
   return UnisatNetwork.MAINNET
+}
+
+export const getBinanceNetwork = (network: string) => {
+  if (network === BaseNetwork.MAINNET) return BinanceNetwork.MAINNET
+  if (network === BaseNetwork.TESTNET) return BinanceNetwork.TESTNET
+  if (network === BaseNetwork.SIGNET) return BinanceNetwork.SIGNET
+  return BinanceNetwork.MAINNET
 }
 
 export const getKeplrChainFromNetwork = (network: string) => {
@@ -141,5 +149,12 @@ export const getNetworkForWizz = (network: string) => {
   if (network === WizzNetwork.SIGNET) return BaseNetwork.SIGNET
   if (network === FractalNetwork.TESTNET) return BaseNetwork.TESTNET
   if (network === FractalNetwork.MAINNET) return BaseNetwork.MAINNET
+  return BaseNetwork.MAINNET
+}
+
+export const getNetworkForBinance = (network: string) => {
+  if (network === BinanceNetwork.MAINNET) return BaseNetwork.MAINNET
+  if (network === BinanceNetwork.TESTNET) return BaseNetwork.TESTNET
+  if (network === BinanceNetwork.SIGNET) return BaseNetwork.SIGNET
   return BaseNetwork.MAINNET
 }

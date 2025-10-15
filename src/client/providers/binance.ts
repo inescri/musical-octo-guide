@@ -2,8 +2,12 @@ import * as bitcoin from "bitcoinjs-lib";
 import { WalletProvider } from ".";
 import {
   BINANCE,
+  BinanceNetwork,
   BIP322,
   BIP322_SIMPLE,
+  getBinanceNetwork,
+  getNetworkForBinance,
+  NetworkType,
   ProviderType,
   SignMessageOptions,
   WalletProviderSignPsbtOptions,
@@ -15,6 +19,10 @@ export default class BinanceProvider extends WalletProvider {
 
   public get library(): any | undefined {
     return (window as any).binancew3w?.bitcoin;
+  }
+
+  public get network(): NetworkType {
+    return this.$network.get();
   }
 
   initialize(): void {
@@ -34,7 +42,7 @@ export default class BinanceProvider extends WalletProvider {
 
   async connect(_: ProviderType): Promise<void> {
     if (!this.library) throw new Error("Binance isn't installed");
-    await this.library.switchNetwork("livenet");
+    await this.library.switchNetwork(BinanceNetwork.MAINNET);
     const binanceAccounts = await this.library.requestAccounts();
     if (!binanceAccounts) throw new Error("No accounts found");
     const binancePubKey = await this.library.getPublicKey();
@@ -54,13 +62,19 @@ export default class BinanceProvider extends WalletProvider {
     return await this.library.requestAccounts();
   }
 
+  async switchNetwork(network: NetworkType): Promise<void> {
+    const wantedNetwork = getBinanceNetwork(network);
+    await this.library?.switchChain(wantedNetwork);
+    this.$network.set(network);
+  }
+
   async getPublicKey() {
     return await this.library?.getPublicKey();
   }
 
   async getBalance() {
-    const bal = await this.library.getBalance();
-    return bal.total;
+    const { total } = await this.library?.getBalance();
+    return total;
   }
 
   async sendBTC(): Promise<string> {
@@ -74,6 +88,11 @@ export default class BinanceProvider extends WalletProvider {
     const protocol =
       options?.protocol === BIP322 ? BIP322_SIMPLE : options?.protocol;
     return await this.library?.signMessage(message, protocol);
+  }
+
+  addListeners() {
+    this.library?.on("accountsChanged", this.handleAccountsChanged.bind(this));
+    this.library?.on("networkChanged", this.handleNetworkChanged.bind(this));
   }
 
   async signPsbt({
@@ -113,5 +132,31 @@ export default class BinanceProvider extends WalletProvider {
       signedPsbtBase64: psbtSignedPsbt.toBase64(),
       txId: undefined,
     };
+  }
+
+  private handleNetworkChanged(network: string) {
+    const foundNetwork = getNetworkForBinance(network);
+    if (this.network !== foundNetwork) {
+      this.switchNetwork(foundNetwork);
+    }
+    this.parent.connect(BINANCE);
+  }
+
+  private handleAccountsChanged(accounts: string[]) {
+    if (!accounts.length) {
+      this.parent.disconnect();
+      return;
+    }
+
+    if (this.$store.get().accounts[0] === accounts[0]) {
+      return;
+    }
+
+    this.$store.setKey("accounts", accounts);
+    if (accounts.length > 0) {
+      this.parent.connect(BINANCE);
+    } else {
+      this.parent.disconnect();
+    }
   }
 }
