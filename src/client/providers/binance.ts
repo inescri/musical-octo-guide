@@ -81,7 +81,7 @@ export default class BinanceProvider extends WalletProvider {
       if (!txId) throw new Error('Transaction failed')
       return txId
     }
-    throw new Error("sendBTC not implemented"); 
+    throw new Error("SendBTC is not supported in Binance Wallet"); 
   }
 
   override async signMessage(
