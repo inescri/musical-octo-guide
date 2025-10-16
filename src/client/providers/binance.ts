@@ -13,6 +13,9 @@ import {
 } from "../..";
 import { omitUndefined } from "../../lib/utils";
 
+// Binance Bitcoin provider documentation
+// https://developers.binance.com/docs/binance-w3w/bitcoin-provider
+
 export default class BinanceProvider extends WalletProvider {
   observer?: MutationObserver;
 
@@ -81,7 +84,7 @@ export default class BinanceProvider extends WalletProvider {
       if (!txId) throw new Error('Transaction failed')
       return txId
     }
-    throw new Error("SendBTC is not supported in Binance Wallet"); 
+    throw new Error("Not implemented"); 
   }
 
   override async signMessage(
