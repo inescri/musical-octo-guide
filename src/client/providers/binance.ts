@@ -75,8 +75,13 @@ export default class BinanceProvider extends WalletProvider {
     return balance?.total;
   }
 
-  async sendBTC(): Promise<string> {
-    throw new Error("NOT IMPLEMENTED");
+  async sendBTC(to: string, amount: number): Promise<string> {
+    if (typeof this.library.sendBitcoin === "function") {
+      const txId = await this.library?.sendBitcoin(to, amount)
+      if (!txId) throw new Error('Transaction failed')
+      return txId
+    }
+    throw new Error("sendBTC not implemented"); 
   }
 
   override async signMessage(
