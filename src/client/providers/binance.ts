@@ -2,7 +2,6 @@ import * as bitcoin from "bitcoinjs-lib";
 import { WalletProvider } from ".";
 import {
   BINANCE,
-  BinanceNetwork,
   BIP322,
   BIP322_SIMPLE,
   getBinanceNetwork,
@@ -42,7 +41,6 @@ export default class BinanceProvider extends WalletProvider {
 
   async connect(_: ProviderType): Promise<void> {
     if (!this.library) throw new Error("Binance isn't installed");
-    await this.library.switchNetwork(BinanceNetwork.MAINNET);
     const binanceAccounts = await this.library.requestAccounts();
     if (!binanceAccounts) throw new Error("No accounts found");
     const binancePubKey = await this.library.getPublicKey();
@@ -73,8 +71,8 @@ export default class BinanceProvider extends WalletProvider {
   }
 
   async getBalance() {
-    const { total } = await this.library?.getBalance();
-    return total;
+    const balance = await this.library?.getBalance();
+    return balance?.total;
   }
 
   async sendBTC(): Promise<string> {
