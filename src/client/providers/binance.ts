@@ -55,8 +55,27 @@ export default class BinanceProvider extends WalletProvider {
     this.$store.setKey("paymentPublicKey", binancePubKey);
   }
 
+  
+  addListeners() {
+    this.library?.on("accountsChanged", this.handleAccountsChanged.bind(this));
+    this.library?.on("networkChanged", this.handleNetworkChanged.bind(this));
+  }
+
+  removeListeners() {
+    if (!this.library || !this.library.removeListener) return
+    this.library?.removeListener(
+      'accountsChanged',
+      this.handleAccountsChanged.bind(this)
+    )
+    this.library?.removeListener(
+      'networkChanged',
+      this.handleNetworkChanged.bind(this)
+    )
+  }
+
   dispose() {
     this.observer?.disconnect();
+    this.removeListeners()
   }
 
   async requestAccounts(): Promise<string[]> {
@@ -94,11 +113,6 @@ export default class BinanceProvider extends WalletProvider {
     const protocol =
       options?.protocol === BIP322 ? BIP322_SIMPLE : options?.protocol;
     return await this.library?.signMessage(message, protocol);
-  }
-
-  addListeners() {
-    this.library?.on("accountsChanged", this.handleAccountsChanged.bind(this));
-    this.library?.on("networkChanged", this.handleNetworkChanged.bind(this));
   }
 
   async signPsbt({
