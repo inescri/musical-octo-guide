@@ -30,7 +30,7 @@ export default class BinanceProvider extends WalletProvider {
   initialize(): void {
     if (typeof window !== "undefined" && typeof document !== "undefined") {
       this.observer = new window.MutationObserver(() => {
-        if (this.library || this.isMobile()) {
+        if (this.library) {
           this.$store.setKey("hasProvider", {
             ...this.$store.get().hasProvider,
             [BINANCE]: true,
@@ -55,27 +55,26 @@ export default class BinanceProvider extends WalletProvider {
     this.$store.setKey("paymentPublicKey", binancePubKey);
   }
 
-  
   addListeners() {
     this.library?.on("accountsChanged", this.handleAccountsChanged.bind(this));
     this.library?.on("networkChanged", this.handleNetworkChanged.bind(this));
   }
 
   removeListeners() {
-    if (!this.library || !this.library.removeListener) return
+    if (!this.library || !this.library.removeListener) return;
     this.library?.removeListener(
-      'accountsChanged',
+      "accountsChanged",
       this.handleAccountsChanged.bind(this)
-    )
+    );
     this.library?.removeListener(
-      'networkChanged',
+      "networkChanged",
       this.handleNetworkChanged.bind(this)
-    )
+    );
   }
 
   dispose() {
     this.observer?.disconnect();
-    this.removeListeners()
+    this.removeListeners();
   }
 
   async requestAccounts(): Promise<string[]> {
@@ -84,7 +83,7 @@ export default class BinanceProvider extends WalletProvider {
 
   async switchNetwork(network: NetworkType): Promise<void> {
     const wantedNetwork = getBinanceNetwork(network);
-    await this.library?.switchChain(wantedNetwork);
+    await this.library?.switchNetwork(wantedNetwork);
     this.$network.set(network);
   }
 
@@ -99,11 +98,11 @@ export default class BinanceProvider extends WalletProvider {
 
   async sendBTC(to: string, amount: number): Promise<string> {
     if (typeof this.library.sendBitcoin === "function") {
-      const txId = await this.library?.sendBitcoin(to, amount)
-      if (!txId) throw new Error('Transaction failed')
-      return txId
+      const txId = await this.library?.sendBitcoin(to, amount);
+      if (!txId) throw new Error("Transaction failed");
+      return txId;
     }
-    throw new Error("Not implemented"); 
+    throw new Error("Not implemented");
   }
 
   override async signMessage(
