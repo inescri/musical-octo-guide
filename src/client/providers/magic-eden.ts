@@ -1,14 +1,15 @@
 import * as bitcoin from 'bitcoinjs-lib'
 import {
   BitcoinNetworkType,
-  getAddress,
-  GetAddressOptions,
+  request,
   MessageSigningProtocols,
   sendBtcTransaction,
   SendBtcTransactionOptions,
   signMessage,
   signTransaction,
   SignTransactionOptions,
+  AddressPurpose,
+  RpcErrorCode,
 } from 'sats-connect'
 import { WalletProvider } from '.'
 import {
@@ -17,15 +18,12 @@ import {
   LaserEyesClient,
   LaserEyesStoreType,
   MAGIC_EDEN,
-  MAINNET,
   NetworkType,
   SignMessageOptions,
   WalletProviderSignPsbtOptions,
   SignPsbtResponse,
 } from '../..'
 import {
-  findOrdinalsAddress,
-  findPaymentAddress,
   getBitcoinNetwork,
   getBTCBalance,
   isMainnetNetwork,
@@ -165,44 +163,50 @@ export default class MagicEdenProvider extends WalletProvider {
         throw new Error(`${this.network} is not supported by ${MAGIC_EDEN}`)
       }
 
-      const magicEdenNetwork = getSatsConnectNetwork(this.network || MAINNET)
-      const getAddressOptions = {
-        getProvider: async () => this.library,
-        payload: {
-          purposes: ['ordinals', 'payment'],
+
+     
+      try {
+        const response = await request('getAddresses', {
+          purposes: [AddressPurpose.Ordinals, AddressPurpose.Payment],
           message: 'Connecting with lasereyes',
-          network: {
-            type: magicEdenNetwork as unknown as BitcoinNetworkType,
-          },
-        },
-        onFinish: (response: any) => {
-          const foundAddress = findOrdinalsAddress(response.addresses)
-          const foundPaymentAddress = findPaymentAddress(response.addresses)
-          if (!foundAddress || !foundPaymentAddress)
-            throw new Error('No address found')
-          if (foundAddress && foundPaymentAddress) {
-            this.$store.setKey('address', foundAddress.address)
-            this.$store.setKey('paymentAddress', foundPaymentAddress.address)
-            this.$store.setKey('accounts', response.addresses.map((address: { address: string }) => address.address))
+        })
+
+          if (response.status === "success") {
+          const paymentAddressItem = response.result.addresses.find(
+            (address) => address.purpose === AddressPurpose.Payment,
+          );
+          const ordinalsAddressItem = response.result.addresses.find(
+            (address) => address.purpose === AddressPurpose.Ordinals,
+          );
+
+          if (!paymentAddressItem || !ordinalsAddressItem) {
+            throw new Error("No address found");
           }
-          this.$store.setKey(
+
+          this.$store.setKey('paymentAddress', paymentAddressItem.address);
+          this.$store.setKey('address', ordinalsAddressItem.address);
+          this.$store.setKey('accounts', response.result.addresses.map((address: { address: string }) => address.address));
+            this.$store.setKey(
             'publicKey',
-            String(response.addresses[0].publicKey)
+            String(response.result.addresses[0].publicKey)
           )
           this.$store.setKey(
             'paymentPublicKey',
-            String(response.addresses[1].publicKey)
+            String(response.result.addresses[1].publicKey)
           )
-        },
-        onCancel: () => {
-          throw new Error(`User canceled lasereyes to ${MAGIC_EDEN} wallet`)
-        },
-        onError: () => {
-          throw new Error(`Can't lasereyes to ${MAGIC_EDEN} wallet`)
-        },
-      }
-      await getAddress(getAddressOptions as GetAddressOptions)
+
+        } else {
+          if (response.error.code === RpcErrorCode.USER_REJECTION) {
+            // handle user cancellation error
+          } else {
+            // handle error
+          }
+  }
     
+      } catch(err) {
+        throw new Error(`Can't connect to ${MAGIC_EDEN} wallet: ${err}`)
+      }
+     
   }
 
   async sendBTC(to: string, amount: number): Promise<string> {
