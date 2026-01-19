@@ -12,7 +12,7 @@ export const SANDSHREW_URL_MAINNET: string = 'https://mainnet.sandshrew.io/v2'
 export const SANDSHREW_URL_SIGNET: string = 'https://signet.sandshrew.io/v2'
 export const SANDSHREW_URL_TESTNET: string = 'https://testnet.sandshrew.io/v2'
 export const SANDSHREW_URL_OYLNET: string =
-  'https://ladder-chain-sieve.sandshrew.io/v2'
+  'https://oylnet.oyl.gg/v2'
 
 export const SANDSHREW_LASEREYES_KEY: string = 'lasereyes'
 export const MAESTRO_API_KEY_MAINNET: string =
