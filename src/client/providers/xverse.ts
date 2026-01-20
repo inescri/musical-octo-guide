@@ -6,6 +6,7 @@ import {
   MessageSigningProtocols,
   RpcErrorCode,
   request,
+  type NetworkChangeEvent,
 } from "sats-connect"
 import {
   ECDSA,
@@ -77,7 +78,7 @@ export default class XVerseProvider extends WalletProvider {
 
   addListeners() {
     addListener("accountChange", () => {})
-    addListener("networkChange", event => {
+    addListener("networkChange", (event: NetworkChangeEvent) => {
       if (event.type === "networkChange") {
         this.handleNetworkChanged(event.bitcoin.name)
       }
