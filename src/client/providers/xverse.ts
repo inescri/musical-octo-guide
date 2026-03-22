@@ -55,20 +55,7 @@ export default class XVerseProvider extends WalletProvider {
 
   observer?: MutationObserver
 
-  initialize(): void {
-    if (typeof window !== "undefined" && typeof document !== "undefined") {
-      this.observer = new window.MutationObserver(() => {
-        if (this.library || this.isMobile()) {
-          this.$store.setKey("hasProvider", {
-            ...this.$store.get().hasProvider,
-            [XVERSE]: true,
-          })
-          this.observer?.disconnect()
-        }
-      })
-      this.observer.observe(document, { childList: true, subtree: true })
-    }
-  }
+  initialize(): void {}
 
   dispose() {
     this.observer?.disconnect()
@@ -77,7 +64,7 @@ export default class XVerseProvider extends WalletProvider {
 
   addListeners() {
     addListener("accountChange", () => {})
-    addListener("networkChange", event => {
+    addListener("networkChange", (event: any) => {
       if (event.type === "networkChange") {
         this.handleNetworkChanged(event.bitcoin.name)
       }

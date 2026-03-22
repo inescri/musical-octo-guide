@@ -7,22 +7,6 @@ import {
 } from "nanostores"
 import type { ALKANES, BRC20, BTC, RUNES } from "../constants/protocols"
 import { LOCAL_STORAGE_DEFAULT_WALLET } from "../constants/settings"
-import {
-  BINANCE,
-  KEPLR,
-  LEATHER,
-  MAGIC_EDEN,
-  OKX,
-  OP_NET,
-  ORANGE,
-  OYL,
-  PHANTOM,
-  SPARROW,
-  TOKEO,
-  UNISAT,
-  WIZZ,
-  XVERSE,
-} from "../constants/wallets"
 import { DataSourceManager } from "../lib/data-sources/manager"
 import { isBase64, isHex } from "../lib/utils"
 import type {
@@ -38,19 +22,8 @@ import type {
 } from "../types"
 import AlkanesModule from "./modules/alkanes"
 import type { WalletProvider } from "./providers"
-import KeplrProvider from "./providers/keplr"
-import LeatherProvider from "./providers/leather"
-import MagicEdenProvider from "./providers/magic-eden"
-import OkxProvider from "./providers/okx"
-import OpNetProvider from "./providers/op-net"
-import OrangeProvider from "./providers/orange"
-import OylProvider from "./providers/oyl"
-import PhantomProvider from "./providers/phantom"
-import SparrowProvider from "./providers/sparrow"
-import TokeoProvider from "./providers/tokeo"
-import UnisatProvider from "./providers/unisat"
-import { WizzProvider } from "./providers/wizz"
-import XVerseProvider from "./providers/xverse"
+import { detectProviders } from "./providers/detection"
+import { PROVIDER_FACTORIES, type ProviderFactory } from "./providers/registry"
 import type {
   LaserEyesSignPsbtOptions,
   LaserEyesSignPsbtsOptions,
@@ -60,12 +33,13 @@ import type {
   SignPsbtsResponse,
 } from "./types"
 import { triggerDOMShakeHack } from "./utils"
-import BinanceProvider from "./providers/binance"
 
 export class LaserEyesClient {
   readonly $store: MapStore<LaserEyesStoreType>
   readonly $network: WritableAtom<NetworkType>
   readonly $providerMap: Partial<Record<ProviderType, WalletProvider>>
+  private providerFactories!: Record<ProviderType, ProviderFactory>
+  private disposeDetection?: () => void
   private disposed = false
 
   readonly dataSourceManager: DataSourceManager
@@ -75,6 +49,7 @@ export class LaserEyesClient {
 
   dispose() {
     this.disposed = true
+    this.disposeDetection?.()
     for (const provider of Object.values(this.$providerMap)) {
       provider.dispose()
     }
@@ -90,22 +65,13 @@ export class LaserEyesClient {
     this.$store = stores.$store
     this.$network = stores.$network
     keepMount(this.$store)
-    this.$providerMap = {
-      [LEATHER]: new LeatherProvider(stores, this, config),
-      [MAGIC_EDEN]: new MagicEdenProvider(stores, this, config),
-      [OKX]: new OkxProvider(stores, this, config),
-      [OP_NET]: new OpNetProvider(stores, this, config),
-      [ORANGE]: new OrangeProvider(stores, this, config),
-      [OYL]: new OylProvider(stores, this, config),
-      [PHANTOM]: new PhantomProvider(stores, this, config),
-      [SPARROW]: new SparrowProvider(stores, this, config),
-      [TOKEO]: new TokeoProvider(stores, this, config),
-      [UNISAT]: new UnisatProvider(stores, this, config),
-      [XVERSE]: new XVerseProvider(stores, this, config),
-      [WIZZ]: new WizzProvider(stores, this, config),
-      [KEPLR]: new KeplrProvider(stores, this, config),
-      [BINANCE]: new BinanceProvider(stores, this, config),
-    }
+    this.$providerMap = {}
+    this.providerFactories = Object.fromEntries(
+      Object.entries(PROVIDER_FACTORIES).map(([key, creator]) => [
+        key,
+        creator(stores, this, config),
+      ])
+    ) as Record<ProviderType, ProviderFactory>
 
     this.modules = {
       alkanes: new AlkanesModule(this),
@@ -121,6 +87,7 @@ export class LaserEyesClient {
 
   initialize() {
     this.$network.listen(this.watchNetworkChange.bind(this))
+    this.disposeDetection = detectProviders(this.$store)
 
     listenKeys(this.$store, ["isInitializing"], (v, oldValue) => {
       if (this.disposed) {
@@ -186,7 +153,9 @@ export class LaserEyesClient {
     try {
       localStorage?.setItem(LOCAL_STORAGE_DEFAULT_WALLET, defaultWallet)
       if (!this.$providerMap[defaultWallet]) {
-        throw new Error("Unsupported wallet provider")
+        const factory = this.providerFactories[defaultWallet]
+        if (!factory) throw new Error("Unsupported wallet provider")
+        this.$providerMap[defaultWallet] = await factory()
       }
       const provider = this.$providerMap[defaultWallet]
       const connected = await provider?.connect(defaultWallet)

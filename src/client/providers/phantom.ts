@@ -39,20 +39,6 @@ export default class PhantomProvider extends WalletProvider {
   observer?: MutationObserver
 
   initialize() {
-    if (typeof window !== 'undefined' && typeof document !== 'undefined') {
-      this.observer = new window.MutationObserver(() => {
-        if (this.library) {
-          this.$store.setKey('hasProvider', {
-            ...this.$store.get().hasProvider,
-            [PHANTOM]: true,
-          })
-          this.observer?.disconnect()
-        }
-      })
-
-      this.observer.observe(document, { childList: true, subtree: true })
-    }
-
     listenKeys(this.$store, ['provider'], (newStore) => {
       if (newStore.provider !== PHANTOM) {
         // this.removeListeners()

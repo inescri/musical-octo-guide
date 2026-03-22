@@ -27,20 +27,7 @@ export default class BinanceProvider extends WalletProvider {
     return this.$network.get();
   }
 
-  initialize(): void {
-    if (typeof window !== "undefined" && typeof document !== "undefined") {
-      this.observer = new window.MutationObserver(() => {
-        if (this.library) {
-          this.$store.setKey("hasProvider", {
-            ...this.$store.get().hasProvider,
-            [BINANCE]: true,
-          });
-          this.observer?.disconnect();
-        }
-      });
-      this.observer.observe(document, { childList: true, subtree: true });
-    }
-  }
+  initialize(): void {}
 
   async connect(_: ProviderType): Promise<void> {
     if (!this.library) throw new Error("Binance isn't installed");

@@ -41,21 +41,8 @@ export default class SparrowProvider extends WalletProvider {
   )
 
   initialize() {
-    if (typeof window !== 'undefined' && typeof document !== 'undefined') {
-      this.observer = new window.MutationObserver(() => {
-        if (!this.library) {
-          // Create a new instance of the SparrowWalletProvider if it's not already available
-          ;(window as any).SparrowWalletProvider =
-            new DefaultSparrowWalletProvider()
-        }
-        this.$store.setKey('hasProvider', {
-          ...this.$store.get().hasProvider,
-          [SPARROW]: true,
-        })
-        this.observer?.disconnect()
-      })
-
-      this.observer.observe(document, { childList: true, subtree: true })
+    if (typeof window !== 'undefined' && !this.library) {
+      ;(window as any).SparrowWalletProvider = new DefaultSparrowWalletProvider()
     }
 
     listenKeys(this.$store, ['provider'], (newVal) => {

@@ -90,18 +90,6 @@ export default class OrangeProvider extends WalletProvider {
   }
 
   initialize(): void {
-    if (typeof window !== 'undefined' && typeof document !== 'undefined') {
-      this.observer = new window.MutationObserver(() => {
-        if (window.OrangeBitcoinProvider) {
-          this.$store.setKey('hasProvider', {
-            ...this.$store.get().hasProvider,
-            [ORANGE]: true,
-          })
-          this.observer?.disconnect()
-        }
-      })
-      this.observer?.observe(document, { childList: true, subtree: true })
-    }
     listenKeys(this.$store, ['provider'], (newVal) => {
       if (newVal.provider !== ORANGE) {
         if (this.removeSubscriber) {

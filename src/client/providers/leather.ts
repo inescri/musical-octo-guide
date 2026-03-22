@@ -85,20 +85,6 @@ export default class LeatherProvider extends WalletProvider {
 	}
 
 	initialize() {
-		if (typeof window !== "undefined" && typeof document !== "undefined") {
-			this.observer = new window.MutationObserver(() => {
-				const leatherLib = (window as unknown as { LeatherProvider: unknown })
-					?.LeatherProvider;
-				if (leatherLib) {
-					this.$store.setKey("hasProvider", {
-						...this.$store.get().hasProvider,
-						[LEATHER]: true,
-					});
-					this.observer?.disconnect();
-				}
-			});
-			this.observer.observe(document, { childList: true, subtree: true });
-		}
 		listenKeys(this.$store, ["provider"], (newStore) => {
 			if (newStore.provider !== LEATHER) {
 				if (this.removeSubscriber) {

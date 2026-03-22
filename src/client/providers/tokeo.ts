@@ -66,18 +66,6 @@ export default class TokeoProvider extends WalletProvider {
   }
 
   initialize() {
-    if (typeof window !== 'undefined' && typeof document !== 'undefined') {
-      this.observer = new window.MutationObserver(() => {
-        if (this.library || this.isMobile()) {
-          this.$store.setKey('hasProvider', {
-            ...this.$store.get().hasProvider,
-            [TOKEO]: true,
-          })
-          this.observer?.disconnect()
-        }
-      })
-      this.observer.observe(document, { childList: true, subtree: true })
-    }
     listenKeys(this.$store, ['provider'], (newStore) => {
       if (newStore.provider !== TOKEO) {
         if (this.removeSubscriber) {

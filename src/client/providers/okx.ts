@@ -101,20 +101,6 @@ export default class OkxProvider extends WalletProvider {
   }
 
   initialize(): void {
-    if (typeof window !== 'undefined' && typeof document !== 'undefined') {
-      this.observer = new window.MutationObserver(() => {
-        const okxLib = this.library
-
-        if (okxLib) {
-          this.$store.setKey('hasProvider', {
-            ...this.$store.get().hasProvider,
-            [OKX]: true,
-          })
-          this.observer?.disconnect()
-        }
-      })
-      this.observer?.observe(document, { childList: true, subtree: true })
-    }
     listenKeys(this.$store, ['provider'], (newVal) => {
       if (newVal.provider !== OKX) {
         if (this.removeSubscriber) {
