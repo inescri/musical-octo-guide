@@ -12,6 +12,7 @@ import { TEXT_PLAIN } from '../constants/content'
 import { generatePrivateKey, getAddressType, getRedeemScript } from './btc'
 import type { DataSourceManager } from './data-sources/manager'
 import type { WalletProviderSignPsbtOptions } from '../client/types'
+import { toHex } from 'uint8array-tools'
 
 bitcoin.initEccLib(ecc2)
 
@@ -60,7 +61,7 @@ export const inscribeContent = async ({
   }
 
   const privKeyBuff = await generatePrivateKey(network)
-  const privKey = Buffer.from(privKeyBuff).toString('hex')
+  const privKey = toHex(privKeyBuff)
   const ixs = inscriptions
     ? inscriptions
     : Array(quantity).fill({

@@ -295,14 +295,6 @@ export abstract class WalletProvider {
     inscriptionIds: string[],
     toAddress: string
   ): Promise<string> {
-    const inscriptions = await this.getInscriptions()
-    const inscriptionsToSend = inscriptions.filter((inscription) =>
-      inscriptionIds.includes(inscription.id)
-    )
-    if (inscriptionsToSend.length !== inscriptionIds.length) {
-      throw new Error('Missing inscriptions')
-    }
-
     return await sendInscriptions({
       inscriptionIds,
       ordinalAddress: this.$store.get().address,

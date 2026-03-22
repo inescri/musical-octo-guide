@@ -11,6 +11,9 @@ export default defineConfig({
     }),
   ],
   build: {
+    rollupOptions: {
+      external: ['nanostores'],
+    },
     lib: {
       entry: resolve(__dirname, 'src/index.ts'),
       outputDir: 'dist/types',

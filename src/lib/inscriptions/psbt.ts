@@ -1,17 +1,16 @@
 import * as bitcoin from 'bitcoinjs-lib'
 import { getRecommendedFeesMempoolSpace } from '../mempool-space'
-import { MAINNET, P2SH, P2TR } from '../../constants'
+import { MAINNET } from '../../constants'
 import {
   broadcastTx,
-  calculateValueOfUtxosGathered,
-  estimateTxSize,
   getBitcoinNetwork,
 } from '../helpers'
-import { NetworkType } from '../../types'
-import { getAddressType, getRedeemScript } from '../btc'
-import { toXOnly } from 'bitcoinjs-lib/src/psbt/bip371'
-import { DataSourceManager } from '../data-sources/manager'
-import { WalletProviderSignPsbtOptions } from '../../client/types'
+import type { NetworkType } from '../../types'
+import type { DataSourceManager } from '../data-sources/manager'
+import type { WalletProviderSignPsbtOptions } from '../../client/types'
+import { filterSpendableUTXOs } from '../utils'
+import { addInputForUtxo, calculateTaprootTxSize, findXAmountOfSats, formatInputsToSign, inscriptionSats } from '../psbt'
+import { toHex } from 'uint8array-tools'
 
 export const sendInscriptions = async ({
   inscriptionIds,
@@ -80,7 +79,6 @@ export const createInscriptionsSendPsbt = async ({
   fromAddress,
   fromAddressPublicKey,
   fromPaymentAddress,
-  fromPaymentPublicKey,
   toAddress,
   inscriptionIds,
   dataSourceManager,
@@ -101,13 +99,15 @@ export const createInscriptionsSendPsbt = async ({
   try {
     const { fastestFee: feeRate } =
       await getRecommendedFeesMempoolSpace(network)
-    const utxos = await dataSourceManager.getAddressUtxos(fromPaymentAddress)
-    let sortedUtxos = utxos
-      .sort((a: { value: number }, b: { value: number }) => b.value - a.value)
-      .filter((utxo: { value: number }) => utxo.value > 3000)
-    if (sortedUtxos.length === 0) {
-      throw new Error('No utxos found')
-    }
+    // const utxos = await dataSourceManager.getAddressUtxos(fromPaymentAddress)
+    const utxos = await dataSourceManager.getFormattedUTXOs(fromPaymentAddress)
+    const { utxos: spendableUtxos } = filterSpendableUTXOs(utxos)
+    // let sortedUtxos = utxos
+    //   .sort((a: { value: number }, b: { value: number }) => b.value - a.value)
+    //   .filter((utxo: { value: number }) => utxo.value > 3000)
+    // if (sortedUtxos.length === 0) {
+    //   throw new Error('No utxos found')
+    // }
 
     const sandshrew = dataSourceManager.getSource('sandshrew')
 
@@ -119,91 +119,93 @@ export const createInscriptionsSendPsbt = async ({
 
     console.log(inscriptions)
 
-    let psbt = new bitcoin.Psbt({ network: getBitcoinNetwork(network) })
-    const amountGathered = calculateValueOfUtxosGathered(sortedUtxos)
-    const minFee = estimateTxSize(inscriptions.length, 2, 4)
-    const calculatedFee = minFee * feeRate < 250 ? 250 : minFee * feeRate
-    let finalFee = calculatedFee
+    const psbt = new bitcoin.Psbt({ network: getBitcoinNetwork(network) })
+    // const minFee = estimateTxSize(inscriptions.length, 2, 4)
+    // const calculatedFee = minFee * feeRate < 250 ? 250 : minFee * feeRate
+    // let finalFee = calculatedFee
+    const minTxSize = calculateTaprootTxSize(inscriptions.length, 2, 4);
+    const minFee = BigInt(Math.ceil(Math.max(minTxSize * feeRate, 250)));
+    let spendableUtxosGathered = {
+      utxos: spendableUtxos,
+      totalAmount: spendableUtxos.reduce((acc, utxo) => acc + utxo.btcValue, 0),
+    };
 
-    let counter = 0
+    spendableUtxosGathered = findXAmountOfSats(
+      spendableUtxosGathered.utxos,
+      Number(minFee) + Number(inscriptionSats),
+    );
+
+    if (spendableUtxosGathered.utxos.length < 1) {
+      throw new Error("Insufficient balance");
+    }
+
+    const newSize = calculateTaprootTxSize(spendableUtxosGathered.utxos.length, 2, 4);
+    const newFee = BigInt(Math.ceil(Math.max(newSize * feeRate, 250)));
+    if (spendableUtxosGathered.totalAmount < newFee) {
+      spendableUtxosGathered = findXAmountOfSats(
+        spendableUtxosGathered.utxos,
+        Number(newFee) + Number(inscriptionSats),
+      );
+    }
+    const finalSize = calculateTaprootTxSize(spendableUtxosGathered.utxos.length, 2, 4);
+    const finalFee = BigInt(Math.ceil(Math.max(finalSize * feeRate, 250)));
+    const targetInputValue = finalFee + inscriptionSats * 2n;
+
+    let totalInputValue = 0n;
+    const usedUTXOSet: Set<string> = new Set();
+
     for await (const runeOutput of inscriptions) {
-      const { value, satpoint } = runeOutput
+      const { value, satpoint, address } = runeOutput
       const [txHash, vout] = satpoint.split(':')
       if (!value || !txHash || !vout) {
         throw new Error('Invalid satpoint or value')
       }
 
       const script = bitcoin.address.toOutputScript(fromAddress, getBitcoinNetwork(MAINNET))
-      psbt.addInput({
-        hash: txHash,
-        index: parseInt(vout),
-        witnessUtxo: {
-          value: BigInt(value),
-          script
-        },
-        tapInternalKey: toXOnly(Buffer.from(fromAddressPublicKey, 'hex')),
-      })
+      addInputForUtxo(psbt, {
+        txHash,
+        txOutputIndex: parseInt(vout),
+        btcValue: value,
+        scriptPubKey: toHex(script),
+        address: address ?? '',
+      });
+      totalInputValue += BigInt(value);
+      usedUTXOSet.add(satpoint);
 
       psbt.addOutput({
         value: BigInt(value),
         address: toAddress,
       })
-      counter++
     }
 
-    const paymentAddressType = getAddressType(fromPaymentAddress, network)
-    for (let i = 0; i < sortedUtxos.length; i++) {
-      const script = bitcoin.address.toOutputScript(
-        fromPaymentAddress,
-        getBitcoinNetwork(MAINNET)
-      )
-      const utxo = sortedUtxos[i]
-
-      if (paymentAddressType === P2TR) {
-        psbt.addInput({
-          hash: utxo.txid,
-          index: utxo.vout,
-          witnessUtxo: {
-            value: BigInt(utxo.value),
-            script,
-          },
-          tapInternalKey: toXOnly(Buffer.from(fromPaymentPublicKey, 'hex')),
-        })
+    for (const utxo of spendableUtxosGathered.utxos) {
+      // The `* 2` here is to account for the input going to the sender and the one going to the receiver
+      if (totalInputValue > targetInputValue) {
+        break;
       }
-
-      if (paymentAddressType === P2SH) {
-        let redeemScript = getRedeemScript(fromPaymentPublicKey, network)
-        psbt.addInput({
-          hash: utxo.txid,
-          index: utxo.vout,
-          witnessUtxo: {
-            value: BigInt(utxo.value),
-            script,
-          },
-          redeemScript,
-        })
-      }
-
-      if (paymentAddressType === 'p2wpkh') {
-        psbt.addInput({
-          hash: utxo.txid,
-          index: utxo.vout,
-          witnessUtxo: {
-            value: BigInt(utxo.value),
-            script,
-          },
-        })
+      if (!usedUTXOSet.has(`${utxo.txHash}:${utxo.txOutputIndex.toString()}`)) {
+        addInputForUtxo(psbt, utxo);
+        totalInputValue += BigInt(utxo.btcValue);
+        // This looks useless but it's good to have it anyways
+        usedUTXOSet.add(`${utxo.txHash}:${utxo.txOutputIndex.toString()}`);
       }
     }
 
-    const changeAmount = amountGathered - (finalFee)
+    const outputTotal = psbt.txOutputs.reduce((sum, o) => sum + o.value, 0n);
+    const changeAmount = totalInputValue - outputTotal - finalFee;
 
     psbt.addOutput({
       address: fromAddress,
-      value: BigInt(changeAmount),
-    })
+      value: changeAmount,
+    });
 
-    return { psbtBase64: psbt.toBase64(), psbtHex: psbt.toHex() }
+    const formattedPsbtTx = await formatInputsToSign({
+      _psbt: psbt,
+      senderPublicKey: fromAddressPublicKey,
+      network: getBitcoinNetwork(network),
+    });
+
+    return { psbtBase64: formattedPsbtTx.toBase64(), psbtHex: formattedPsbtTx.toHex() }
   } catch (error) {
     throw error
   }

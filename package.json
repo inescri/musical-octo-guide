@@ -1,8 +1,11 @@
 {
   "name": "inescri-musical-octo-guide",
   "private": false,
-  "version": "0.0.12",
+  "version": "0.0.14",
   "type": "module",
+  "repository": {
+    "url": "https://github.com/omnisat/lasereyes-mono"
+  },
   "main": "./dist/index.umd.cjs",
   "module": "./dist/index.js",
   "files": [
@@ -29,11 +32,15 @@
     "@types/tiny-async-pool": "^2.0.3",
     "eslint": "^9.30.0",
     "globals": "^15.9.0",
+    "nanostores": "^0.11.3",
     "sonda": "^0.7.1",
     "typescript": "5.8.3",
     "vite": "^5.4.1",
     "vite-plugin-dts": "^4.2.1",
     "vite-plugin-node-polyfills": "^0.22.0"
+  },
+  "peerDependencies": {
+    "nanostores": ">=0.11"
   },
   "dependencies": {
     "@bitcoinerlab/secp256k1": "^1.1.1",
@@ -50,12 +57,13 @@
     "bitcoinjs-lib": "^7.0.0-rc.0",
     "buffer": "^6.0.3",
     "crypto-browserify": "^3.12.1",
-    "nanostores": "^0.11.3",
     "ordapi": "^0.0.7",
-    "sats-connect": "^3.3.0",
-    "tiny-async-pool": "^2.1.0"
+    "sats-connect": "^4.2.1",
+    "tiny-async-pool": "^2.1.0",
+    "uint8array-tools": "^0.0.9"
   },
   "publishConfig": {
-    "access": "public"
+    "access": "public",
+    "provenance": true
   }
 }
