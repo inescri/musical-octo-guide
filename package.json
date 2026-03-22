@@ -39,7 +39,9 @@
     "vite-plugin-dts": "^4.2.1"
   },
   "peerDependencies": {
-    "nanostores": ">=0.11"
+    "bitcoinjs-lib": ">=7.0.0-rc.0",
+    "nanostores": ">=0.11",
+    "sats-connect": ">=4.0.0"
   },
   "dependencies": {
     "@bitcoinerlab/secp256k1": "^1.1.1",
@@ -52,10 +54,8 @@
     "axios": "^1.7.7",
     "bip32": "5.0.0-rc.0",
     "bip39": "^3.1.0",
-    "bitcoinjs-lib": "^7.0.0-rc.0",
     "buffer": "^6.0.3",
     "ordapi": "^0.0.7",
-    "sats-connect": "^4.2.1",
     "tiny-async-pool": "^2.1.0",
     "uint8array-tools": "^0.0.9"
   },

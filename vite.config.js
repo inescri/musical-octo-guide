@@ -8,7 +8,16 @@ export default defineConfig({
   ],
   build: {
     rollupOptions: {
-      external: ['nanostores'],
+      external: ['nanostores', 'bitcoinjs-lib', /^bitcoinjs-lib\//, 'sats-connect'],
+      output: {
+        globals: {
+          nanostores: 'nanostores',
+          'bitcoinjs-lib': 'bitcoin',
+          'bitcoinjs-lib/src/psbt/bip371': 'bitcoin',
+          'bitcoinjs-lib/src/address': 'bitcoin',
+          'sats-connect': 'satsConnect',
+        },
+      },
     },
     lib: {
       entry: resolve(__dirname, 'src/index.ts'),
