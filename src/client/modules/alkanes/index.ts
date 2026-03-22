@@ -1,5 +1,5 @@
 import type { Account } from "./types"
-import type { AlkaneId } from "alkanes"
+import type { AlkaneId } from "alkanes/lib/alkane"
 import { toXOnly } from "bitcoinjs-lib/src/psbt/bip371"
 import type { SandshrewDataSource } from "../../.."
 import { getBitcoinNetwork } from "../../../lib/helpers"

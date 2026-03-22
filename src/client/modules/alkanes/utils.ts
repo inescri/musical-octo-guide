@@ -1,12 +1,10 @@
 import { u32 } from "@magiceden-oss/runestone-lib/dist/src/integer";
 import { u128 } from "@magiceden-oss/runestone-lib/dist/src/integer/u128";
 import type { Account } from "./types";
-import {
-	type AlkaneId,
-	encipher,
-	encodeRunestoneProtostone,
-	ProtoStone,
-} from "alkanes/lib/index.js";
+import type { AlkaneId } from "alkanes/lib/alkane";
+import { encipher } from "alkanes/lib/bytes";
+import { encodeRunestoneProtostone } from "alkanes/lib/protorune/proto_runestone_upgrade";
+import { ProtoStone } from "alkanes/lib/protorune/protostone";
 import { ProtoruneRuneId } from "alkanes/lib/protorune/protoruneruneid";
 import * as bitcoin from "bitcoinjs-lib";
 import { getBitcoinNetwork } from "../../../lib/helpers";

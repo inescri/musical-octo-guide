@@ -1,5 +1,5 @@
 import { FormattedUTXO } from '../types/utxo'
-import { AlkaneId } from 'alkanes'
+import { AlkaneId } from 'alkanes/lib/alkane'
 
 export const isBase64 = (str: string): boolean => {
   const base64Regex =
