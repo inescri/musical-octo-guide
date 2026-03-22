@@ -1,7 +1,7 @@
 {
   "name": "inescri-musical-octo-guide",
   "private": false,
-  "version": "0.0.13",
+  "version": "0.0.14",
   "type": "module",
   "main": "./dist/index.umd.cjs",
   "module": "./dist/index.js",
@@ -58,18 +58,42 @@
     "sats-connect": "^3.3.0"
   },
   "peerDependenciesMeta": {
-    "@bitcoinerlab/secp256k1": { "optional": true },
-    "@cmdcode/crypto-utils": { "optional": true },
-    "@cmdcode/tapscript": { "optional": true },
-    "@leather.io/rpc": { "optional": true },
-    "@magiceden-oss/runestone-lib": { "optional": true },
-    "@orangecrypto/orange-connect": { "optional": true },
-    "@oyl/sdk": { "optional": true },
-    "alkanes": { "optional": true },
-    "bip32": { "optional": true },
-    "bip39": { "optional": true },
-    "bitcoinjs-lib": { "optional": true },
-    "sats-connect": { "optional": true }
+    "@bitcoinerlab/secp256k1": {
+      "optional": true
+    },
+    "@cmdcode/crypto-utils": {
+      "optional": true
+    },
+    "@cmdcode/tapscript": {
+      "optional": true
+    },
+    "@leather.io/rpc": {
+      "optional": true
+    },
+    "@magiceden-oss/runestone-lib": {
+      "optional": true
+    },
+    "@orangecrypto/orange-connect": {
+      "optional": true
+    },
+    "@oyl/sdk": {
+      "optional": true
+    },
+    "alkanes": {
+      "optional": true
+    },
+    "bip32": {
+      "optional": true
+    },
+    "bip39": {
+      "optional": true
+    },
+    "bitcoinjs-lib": {
+      "optional": true
+    },
+    "sats-connect": {
+      "optional": true
+    }
   },
   "publishConfig": {
     "access": "public"
