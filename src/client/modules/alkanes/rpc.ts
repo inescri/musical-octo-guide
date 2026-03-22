@@ -2,7 +2,7 @@ import asyncPool from 'tiny-async-pool'
 import * as alkanes_rpc from 'alkanes/lib/rpc'
 import type { AlkaneSimulateRequest, AlkaneToken } from './types'
 import type { AlkanesOutpoint } from '../../../types'
-import type { AlkanesResponse } from '@oyl/sdk/lib/rpclient/alkanes'
+import type { AlkanesRpcResponse as AlkanesResponse } from './types'
 
 export class MetashrewOverride {
   public override: any

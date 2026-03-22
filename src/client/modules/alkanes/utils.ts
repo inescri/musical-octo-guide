@@ -1,6 +1,6 @@
 import { u32 } from "@magiceden-oss/runestone-lib/dist/src/integer";
 import { u128 } from "@magiceden-oss/runestone-lib/dist/src/integer/u128";
-import type { Account } from "@oyl/sdk/lib/account";
+import type { Account } from "./types";
 import {
 	type AlkaneId,
 	encipher,

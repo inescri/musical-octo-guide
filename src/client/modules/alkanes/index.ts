@@ -1,4 +1,4 @@
-import type { Account } from "@oyl/sdk/lib/account"
+import type { Account } from "./types"
 import type { AlkaneId } from "alkanes"
 import { toXOnly } from "bitcoinjs-lib/src/psbt/bip371"
 import type { SandshrewDataSource } from "../../.."
